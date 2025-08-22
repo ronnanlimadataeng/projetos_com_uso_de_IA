@@ -1,0 +1,830 @@
+{
+  "name": "workflow_newsletters",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 10
+            }
+          ]
+        }
+      },
+      "id": "9383e2f9-772e-419d-a9c9-a10b5c9e2c65",
+      "name": "Agendamento de job",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        2016,
+        5568
+      ],
+      "typeVersion": 1.2,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4",
+          "mode": "list",
+          "cachedResultName": "GPT-4"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=gere um texto de assunto de email para o email do dia atual focado em notícias, dados, ia e startups"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        2240,
+        5568
+      ],
+      "id": "0004403e-b0f5-409c-96c6-b229eb9526ce",
+      "name": "Assunto Email",
+      "credentials": {
+        "openAiApi": {
+          "id": "ApcrVsq8gkPq63YK",
+          "name": "OpenAi account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Você é um verificador de notícias.  \nRegras e Tarefas:\n\n1. Considere **apenas notícias publicadas ou atualizadas exatamente na data de hoje**: {{ $('Agendamento de job').item.json[\"Readable date\"] }} (fuso America/Sao_Paulo).  \n   - Se a notícia não mostrar claramente a data de publicação/atualização, ignore.  \n   - Nunca invente ou assuma datas.\n\n2. Busque SOMENTE itens relacionados a:\n   - Dados / Big Data  \n   - Inteligência Artificial (IA/LLMs)  \n   - Startups de tecnologia  \n   - Recursos técnicos (novos serviços, ferramentas, frameworks)  \n   - Eventos relevantes da área  \n\n3. Regras de filtragem:\n   - Remova duplicatas entre domínios.  \n   - Máximo de 12 itens, listados do mais recente ao mais antigo.  \n   - Não inclua anúncios comerciais irrelevantes ou postagens sem relação direta com os temas.  \n\n4. Formato de resposta:\n   - Escreva em PT-BR, claro e direto.  \n   - Cada item deve ter **2 linhas de descrição**, seguido de:  \n     - \"Fonte: {nome do site} - {data por extenso}\"  \n     - \"Link: {URL}\"  \n\n5. Exemplo de saída:\nOpenAI anuncia GPT-4 Turbo, versão otimizada do GPT-4 com custos e latência reduzidos para startups e desenvolvedores.\nFonte: openai.com/pt-BR/news/ - 27 de junho de 2024\nLink: https://openai.com/pt-BR/news/\n\n6. Caso não exista nenhuma notícia de hoje, faça um resumo da semana buscando na internet, não invente nada.\n\n---\n\n### Fontes autorizadas:\n- https://blog.fabric.microsoft.com/pt-BR/blog  \n- https://techcommunity.microsoft.com  \n- https://developers.googleblog.com/pt-br/  \n- https://openai.com/pt-BR/news/  \n- https://community.databricks.com/t5/events/eb-p/databricks-community-events  \n- https://www.databricks.com/blog  \n- https://azure.microsoft.com/en-us/blog/  \n- https://ai.meta.com/blog/  \n- https://deepmind.google/discover/blog/  \n- https://x.ai/news  \n- https://news.microsoft.com/source/topics/ai/  \n- https://www.uber.com/en-IN/blog/chennai/engineering/data/  \n- https://developer.nvidia.com/blog  \n- https://github.blog/ai-and-ml/  \n- https://insideainews.com/  \n- https://www.theinformation.com/  \n- https://tecnoblog.net/tema/robos-inteligencia-artificial/ ",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        2592,
+        5568
+      ],
+      "id": "b767e761-5628-4733-aa7e-8e47214d9c64",
+      "name": "Agent - Pesquisar Noticias",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-chat-latest",
+          "mode": "list",
+          "cachedResultName": "gpt-5-chat-latest"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2656,
+        5792
+      ],
+      "id": "0669bff8-607d-4830-9ee7-01a1008b87a2",
+      "name": "Modelo ChatGPT",
+      "credentials": {
+        "openAiApi": {
+          "id": "ApcrVsq8gkPq63YK",
+          "name": "OpenAi account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1B2grA5L8XlG1fz5nOCwXOI8gjkHWuMA8Fku0OAakKmM/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "emails",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "a7c5055d-ff3b-4446-94ac-9cedf6b6a672",
+      "name": "Lista de Emails",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        3168,
+        5568
+      ],
+      "typeVersion": 4.5,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gq8FCUukWYPip3IQ",
+          "name": "Google Sheets account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "id": "424efbfe-2707-4c89-9d72-0fa8171689a5",
+      "name": "Juntar Conteúdos",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        3392,
+        5568
+      ],
+      "typeVersion": 2.1,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "={{ $('Assunto Email').item.json.message.content }}",
+        "emailType": "text",
+        "message": "=Olá {{ $json.Name }},\n\nSegue o resumo de hoje:\n\n{{ $('Agent - Pesquisar Noticias').item.json.output }}\n\nAbs,\nRonnan",
+        "options": {}
+      },
+      "id": "7fa3322e-032a-456b-a74c-d656ff8b0de0",
+      "name": "Enviar Email",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        3616,
+        5568
+      ],
+      "typeVersion": 2.1,
+      "webhookId": "5ff9f2d2-eefa-4f5d-87cc-bf10afdef85a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "0sIck7ob0YtiOkB6",
+          "name": "Gmail account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "newsBody",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "766b0c2d-f952-4214-9b29-987a725e968f",
+      "name": "Ajuste corpo Email",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2944,
+        5568
+      ],
+      "typeVersion": 2,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Lê o item atual\nconst item = $input.item;\n\n// Garante que só mantenha o campo 'text'\nreturn {\n  json: {\n    text: item.json.text\n  }\n};"
+      },
+      "id": "510456f5-5904-490b-ac32-2c54546be892",
+      "name": "Parse JSON",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        3008,
+        6112
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "unit": "seconds"
+      },
+      "id": "9faab46a-9f46-485c-90dc-7e8b3035a2d4",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        1664,
+        6208
+      ],
+      "webhookId": "d44bc024-1c21-44e0-b2b4-5cff6fb9f402",
+      "typeVersion": 1,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1B2grA5L8XlG1fz5nOCwXOI8gjkHWuMA8Fku0OAakKmM/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1014683551,
+          "mode": "list",
+          "cachedResultName": "noticias",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1B2grA5L8XlG1fz5nOCwXOI8gjkHWuMA8Fku0OAakKmM/edit#gid=1014683551"
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "Domain",
+              "fieldValue": "={{ $json.Domain }}"
+            },
+            {
+              "fieldId": "News",
+              "fieldValue": "={{ $json.text }}"
+            },
+            {
+              "fieldId": "Date",
+              "fieldValue": "={{ $('Agendamento').item.json[\"Readable date\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8487c5f7-5053-460f-8f99-062267575f21",
+      "name": "Update Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        4288,
+        6000
+      ],
+      "typeVersion": 3,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gq8FCUukWYPip3IQ",
+          "name": "Google Sheets account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1B2grA5L8XlG1fz5nOCwXOI8gjkHWuMA8Fku0OAakKmM/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "emails",
+          "mode": "name"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Name",
+              "lookupValue": "Ronnan"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "444d7a31-06c9-49fe-b576-3543aea190e9",
+      "name": "Lista de Emails2",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        3808,
+        6112
+      ],
+      "typeVersion": 4.5,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gq8FCUukWYPip3IQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "=Essa é a nossa newsletter! e esses são os principais assuntos de hoje!",
+        "emailType": "text",
+        "message": "=Olá {{ $json.Name }},\n{{ $('Agent - Pesquisar Noticias1').item.json.output }}\n\n",
+        "options": {}
+      },
+      "id": "d408f176-18a1-4b64-9864-6f776ccd07e3",
+      "name": "Enviar Email2",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        4032,
+        6112
+      ],
+      "typeVersion": 2.1,
+      "webhookId": "5ff9f2d2-eefa-4f5d-87cc-bf10afdef85a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "0sIck7ob0YtiOkB6",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        3232,
+        6112
+      ],
+      "id": "793b13cd-3639-414d-9387-4917db62a29f",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "prompt": "=a partir do seguinte texto {{ $json.text }}, monte um email de newsletter para o conteudo com inicio de boas vindas e reresumo desses noticias.",
+        "simplifyOutput": false,
+        "options": {},
+        "requestOptions": {}
+      },
+      "id": "23d92f4a-745d-4814-8b6b-79ac54975412",
+      "name": "OpenAI1",
+      "type": "n8n-nodes-base.openAi",
+      "position": [
+        4288,
+        6224
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "openAiApi": {
+          "id": "ApcrVsq8gkPq63YK",
+          "name": "OpenAi account"
+        }
+      },
+      "disabled": true,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Prompt\n\nVocê deve agir como um produtor profissional de newsletters.  \n\nMonte um email de newsletter com as seguintes características:  \n\n- Inicie com uma mensagem de boas-vindas.  \n- Em nenhuma hipótese inclua notícias que não sejam do dia atual:  \n  `{{ $('Agendamento').item.json['Readable date'] }}`  \n- A partir do seguinte conteúdo, não inclua nada fora do conteúdo abaixo:  \n  `{{ $json.text }}`  \n\n## Padrão para o corpo do email\n\nCada notícia deve seguir exatamente este formato:\n\n[Texto da notícia resumida]. ({{ $('Agendamento').item.json['Readable date'] }})  \nFonte: [Fonte da notícia]  \n\n### Exemplo:\n\nConversas do chatbot Grok da xAI foram indexadas pelo Google Search, levantando preocupações sobre privacidade e exposição de dados. (20 de agosto de 2025)  \nFonte: TechCrunch  \n\nA Coinbase revelou planos para impulsionar pagamentos digitais com IA e “digital dollars”, apostando no crescimento do setor financeiro inteligente. (20 de agosto de 2025)  \nFonte: Bloomberg",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        3456,
+        6112
+      ],
+      "id": "bc7e7e50-42dc-4f12-b6a4-c8d8054b518e",
+      "name": "Agent - Pesquisar Noticias1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-chat-latest",
+          "mode": "list",
+          "cachedResultName": "gpt-5-chat-latest"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        3536,
+        6336
+      ],
+      "id": "f2529176-7e5f-4609-bdb7-cfd09b7062f8",
+      "name": "Modelo ChatGPT2",
+      "credentials": {
+        "openAiApi": {
+          "id": "ApcrVsq8gkPq63YK",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1B2grA5L8XlG1fz5nOCwXOI8gjkHWuMA8Fku0OAakKmM/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 244265205,
+          "mode": "list",
+          "cachedResultName": "urls_sites",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1B2grA5L8XlG1fz5nOCwXOI8gjkHWuMA8Fku0OAakKmM/edit#gid=244265205"
+        },
+        "options": {}
+      },
+      "id": "9b511685-e791-4c09-ba35-588d9ef8a4f3",
+      "name": "Urls de sites",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        1664,
+        6016
+      ],
+      "typeVersion": 3,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gq8FCUukWYPip3IQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 17,
+        "options": {}
+      },
+      "id": "853b3358-97ce-4487-98b1-13809acb13da",
+      "name": "Caso precise rodar mais de 10 batchs",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        1888,
+        6112
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.Domain }}",
+        "options": {
+          "redirect": {
+            "redirect": {
+              "followRedirects": true
+            }
+          }
+        }
+      },
+      "id": "07af0f4b-273c-43f1-9e5b-9ffce8101d09",
+      "name": "Requisição HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2112,
+        6112
+      ],
+      "typeVersion": 3,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "extractionValues": {
+          "values": [
+            {
+              "key": "body",
+              "cssSelector": "html"
+            }
+          ]
+        },
+        "options": {
+          "trimValues": false
+        }
+      },
+      "id": "61eb7cfb-c9da-497d-b6fd-f6eb110b53a8",
+      "name": "Extração do HTML",
+      "type": "n8n-nodes-base.htmlExtract",
+      "position": [
+        2336,
+        6112
+      ],
+      "typeVersion": 1,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "if ($input.item.json.body){\n\n\n\n$input.item.json.content = $input.item.json.body.replaceAll('/^\\s+|\\s+$/g', '').replace('/(\\r\\n|\\n|\\r)/gm', \"\").replace(/\\s+/g, ' ')\n\n\n  $input.item.json.contentShort = $input.item.json.content.slice(0, 10000)\n}\n\n\n\n\nreturn $input.item"
+      },
+      "id": "bcb7244c-a3ce-475b-83e8-d4abbb8ece3a",
+      "name": "Limpeza do Conteúdo",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2560,
+        6112
+      ],
+      "executeOnce": false,
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "prompt": "=Você deve agir como um **produtor profissional de conteúdos e newsletters**.  \n\nEste é o conteúdo do site:  \n`{{ $node[\"Caso precise rodar mais de 10 batchs\"].json[\"Domain\"] }}`  \n`\"{{ $json[\"contentShort\"] }}\"`\n\nEm nenhum momento traga datas menores que o dia atual {{ $('Agendamento').item.json[\"Readable date\"] }}\n\nSua função é atuar como **verificador de notícias** seguindo as regras abaixo:  \n\n### Regras e Tarefas\n\n1. Considere **apenas notícias publicadas ou atualizadas exatamente na data de hoje**:  \n   `{{ $('Agendamento').item.json['Readable date'] }}` (fuso America/Sao_Paulo).  \n   - Se a notícia **não mostrar claramente** a data de publicação/atualização, ignore.  \n   - Nunca invente ou assuma datas.  \n\n2. Filtre SOMENTE itens relacionados a:  \n   - Dados / Big Data  \n   - Inteligência Artificial (IA/LLMs)  \n   - Startups de tecnologia  \n   - Recursos técnicos (novos serviços, ferramentas, frameworks)  \n   - Eventos relevantes da área  \n\n3. Regras de filtragem adicionais:  \n   - Remova duplicatas entre domínios (mantenha apenas o mais completo/recente).  \n   - Máximo de **12 itens**, ordenados do mais recente para o mais antigo (sempre da data de hoje).  \n   - Exclua anúncios comerciais irrelevantes e postagens sem relação direta com os temas acima.  \n\n4. Formato da resposta (**em PT-BR, claro e direto**):  \n   - Para **cada item**, escreva **2 linhas de descrição concisa**:  \n     - O que foi anunciado.  \n     - Por que isso importa.  \n   - Em seguida, inclua exatamente estas duas linhas:  \n     - `Fonte: {nome do site} - {data por extenso em PT-BR}`  \n   - A data por extenso **deve ser a de hoje** (ex.: 21 de agosto de 2025), igual a:  \n     `{{ $('Agendamento').item.json[\"Readable date\"] }}`\n\nTexto formato para newsletters",
+        "options": {
+          "maxTokens": 120,
+          "temperature": 0,
+          "topP": 1
+        },
+        "requestOptions": {}
+      },
+      "id": "6f307054-3349-4e8d-9514-5dfd86be8477",
+      "name": "Modelo para capturar texto do HTML",
+      "type": "n8n-nodes-base.openAi",
+      "position": [
+        2784,
+        6112
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "openAiApi": {
+          "id": "ApcrVsq8gkPq63YK",
+          "name": "OpenAi account"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 10
+            }
+          ]
+        }
+      },
+      "id": "709b96d1-b1b4-4cc4-bad3-e2c9672001af",
+      "name": "Agendamento",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        1440,
+        6016
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "content": "Agendamento — dispara a execução no horário definido.\n\nLer planilha “Urls de sites” — carrega as URLs a processar.\n\nControle de lotes (opcional) — se houver mais de 10 URLs, divide em batches; o bloco Wait pode pausar entre lotes (está desativado).\n\nPara cada URL:\n\nRequisição HTTP — busca a página.\n\nExtração do HTML — obtém o conteúdo bruto.\n\nLimpeza do Conteúdo — remove tags/ruídos.\n\nModelo para capturar texto do HTML — LLM extrai o texto relevante.\n\nParse JSON — estrutura a saída em JSON.\n\nAggregate — agrega os resultados de todas as URLs.\n\nAgent – Pesquisar — agente (chat model + memória + tools) analisa os dados agregados e produz o resultado final.\n\nLer planilha “Lista de Emails2” — carrega os destinatários.\n\nEnviar Email2 — dispara os e-mails com o resultado.",
+        "height": 512,
+        "width": 832
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1408,
+        6464
+      ],
+      "id": "3dc7c4b3-83b3-415f-b5bc-72d52cd2093e",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Agendamento de job": {
+      "main": [
+        [
+          {
+            "node": "Assunto Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assunto Email": {
+      "main": [
+        [
+          {
+            "node": "Agent - Pesquisar Noticias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agent - Pesquisar Noticias": {
+      "main": [
+        [
+          {
+            "node": "Ajuste corpo Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modelo ChatGPT": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agent - Pesquisar Noticias",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lista de Emails": {
+      "main": [
+        [
+          {
+            "node": "Juntar Conteúdos",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Juntar Conteúdos": {
+      "main": [
+        [
+          {
+            "node": "Enviar Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ajuste corpo Email": {
+      "main": [
+        [
+          {
+            "node": "Lista de Emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Caso precise rodar mais de 10 batchs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse JSON": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Google Sheets1": {
+      "main": [
+        []
+      ]
+    },
+    "Lista de Emails2": {
+      "main": [
+        [
+          {
+            "node": "Enviar Email2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Email2": {
+      "main": [
+        []
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Agent - Pesquisar Noticias1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI1": {
+      "main": [
+        []
+      ]
+    },
+    "Agent - Pesquisar Noticias1": {
+      "main": [
+        [
+          {
+            "node": "Lista de Emails2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modelo ChatGPT2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agent - Pesquisar Noticias1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Urls de sites": {
+      "main": [
+        [
+          {
+            "node": "Caso precise rodar mais de 10 batchs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Caso precise rodar mais de 10 batchs": {
+      "main": [
+        [
+          {
+            "node": "Requisição HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Requisição HTTP": {
+      "main": [
+        [
+          {
+            "node": "Extração do HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extração do HTML": {
+      "main": [
+        [
+          {
+            "node": "Limpeza do Conteúdo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limpeza do Conteúdo": {
+      "main": [
+        [
+          {
+            "node": "Modelo para capturar texto do HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modelo para capturar texto do HTML": {
+      "main": [
+        [
+          {
+            "node": "Parse JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agendamento": {
+      "main": [
+        [
+          {
+            "node": "Urls de sites",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "16e99880-5a47-4b99-af8c-d84862e77683",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "33a7d74a5572dd6b7365183983044579857ca681b256a4593b6e117720881cb6"
+  },
+  "id": "E52kalxO4Q1S8A0U",
+  "tags": []
+}
