@@ -1,1 +1,1 @@
-# Algoritimos_machine_learning
+# Inteligencia Artificial
